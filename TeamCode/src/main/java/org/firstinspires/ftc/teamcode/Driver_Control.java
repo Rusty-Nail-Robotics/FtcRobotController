@@ -14,7 +14,12 @@ public class Driver_Control extends LinearOpMode {
         PinPoint_Sensor odometery = new PinPoint_Sensor();
         odometery.PinPoint_Setup(hardwareMap, this);
         Telemetry_Output telemetryOutput = new Telemetry_Output();
-        waitForStart();
+        //waitForStart();
+        while (!opModeIsActive() && !isStopRequested()){
+            double[] currentPosition = odometery.Read_PinPoint_Position();
+            telemetryOutput.Add_Odometry_Output(hardwareMap, this, currentPosition);
+            telemetry.update();
+        }
         while (opModeIsActive()) {
             telemetry.addData("random", Math.random());
            chassisControl.DriveSystem(hardwareMap, this);
