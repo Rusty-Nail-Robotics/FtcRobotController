@@ -16,14 +16,12 @@ public class Driver_Control extends LinearOpMode {
         Telemetry_Output telemetryOutput = new Telemetry_Output();
         waitForStart();
         while (opModeIsActive()) {
+            telemetry.addData("random", Math.random());
            chassisControl.DriveSystem(hardwareMap, this);
             double[] currentPosition = odometery.Read_PinPoint_Position();
-            telemetry.addData("X location = ", currentPosition[0]);
-            telemetry.addData("Y Location = ", currentPosition[1]);
-            telemetry.addData("Heading = ", currentPosition[2]);
-            telemetry.addData("random", Math.random());
+            telemetryOutput.Add_Odometry_Output(hardwareMap,this, currentPosition);
+            telemetryOutput.Add_Drive_Telem(hardwareMap, this, chassisControl);
             telemetry.update();
-            telemetryOutput.Drive_Telem(hardwareMap, this, chassisControl);
 
         }
     }

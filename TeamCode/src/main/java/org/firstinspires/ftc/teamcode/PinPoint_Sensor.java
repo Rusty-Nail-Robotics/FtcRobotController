@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-import java.util.Locale;
+
 
 public class PinPoint_Sensor {
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
@@ -31,9 +31,6 @@ public class PinPoint_Sensor {
     public double[] Read_PinPoint_Position(){
         odo.update();
         Pose2D pos = odo.getPosition();
-        //String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-        double[] PositionArray_X_Y_RX = {pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES)};
-        //telemetry.addData("Position", data);
-        return PositionArray_X_Y_RX;
+        return new double[]{pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES)};
     }
 }

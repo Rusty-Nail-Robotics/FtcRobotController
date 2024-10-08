@@ -36,7 +36,7 @@ public class Telop_Chassis_Control {
 
     }
 
-    public void DriveSystem(HardwareMap hardwareMap, LinearOpMode linearOpMode){
+    public void DriveSystem(HardwareMap ignoredhardwareMap, LinearOpMode linearOpMode){
         double speedOverride = 1;
 
         if(leftFront.isOverCurrent() || rightFront.isOverCurrent() || leftRear.isOverCurrent() || rightRear.isOverCurrent()){
