@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Telemetry_Output {
-
+//this adds the input and output from gamepad to telop chassis control
     public void Add_Drive_Telem(HardwareMap ignoredHardwareMap, LinearOpMode linearOpMode, Telop_Chassis_Control chassisControl){
         linearOpMode.telemetry.addData("X Call",chassisControl.x);
         linearOpMode.telemetry.addData("Y Call",chassisControl.y);
