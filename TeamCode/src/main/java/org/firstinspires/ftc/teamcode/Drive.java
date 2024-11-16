@@ -9,9 +9,12 @@ public class Drive extends LinearOpMode {
     public void runOpMode() {
         Non_Move non_move = new Non_Move();
         non_move.Setup(hardwareMap,this);
+        Show_Off showOff = new Show_Off();
+        showOff.Setup(hardwareMap, this);
         waitForStart();
         while (opModeIsActive()) {
             non_move.Operations(hardwareMap, this);
+            showOff.SetLedPattern(hardwareMap, this);
 
 
         }
