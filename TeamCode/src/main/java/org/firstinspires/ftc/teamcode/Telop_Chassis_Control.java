@@ -85,10 +85,10 @@ public class Telop_Chassis_Control {
 
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        frontLeftPower = ((y + x + rx) / denominator)*.5;
-        backLeftPower = ((y - x + rx) / denominator)*.5;
-        frontRightPower = ((y - x - rx) / denominator)*.5;
-        backRightPower = ((y + x - rx) / denominator)*.5;
+        frontLeftPower = ((y + x + rx) / denominator)*.25;
+        backLeftPower = ((y - x + rx) / denominator)*.25;
+        frontRightPower = ((y - x - rx) / denominator)*.25;
+        backRightPower = ((y + x - rx) / denominator)*.25;
 
         leftFront.setPower(frontLeftPower);
         leftRear.setPower(backLeftPower);
@@ -98,7 +98,7 @@ public class Telop_Chassis_Control {
 
     }
 
-    public int HasArrived(double[] currentPosition, double[] targetPosition){
+    public int HasArrived( double[] toTarget){
         double acceptableAccuracy = .25;
         double acceptableHeadingAccuracy = 1.25;
 
@@ -106,19 +106,19 @@ public class Telop_Chassis_Control {
         int yArrived;
         int rxArrived;
 
-        if(((currentPosition[0]-targetPosition[0]) < acceptableAccuracy) && ((currentPosition[0]-targetPosition[0]) > -acceptableAccuracy)){
+        if(((toTarget[0]) < acceptableAccuracy) && ((toTarget[0]) > (-1*acceptableAccuracy))){
             xArrived = 1;
         }
         else{
             xArrived = 0;
         }
-        if(((currentPosition[1]-targetPosition[1]) < acceptableAccuracy) && ((currentPosition[1]-targetPosition[1]) > -acceptableAccuracy)){
+        if(((toTarget[1]) < acceptableAccuracy) && ((toTarget[1]) > (-1*acceptableAccuracy))){
             yArrived = 1;
         }
         else{
             yArrived = 0;
         }
-        if(((currentPosition[2]-targetPosition[2]) < acceptableHeadingAccuracy) && ((currentPosition[2]-targetPosition[2]) > -acceptableHeadingAccuracy)){
+        if(((toTarget[2]) < acceptableHeadingAccuracy) && ((toTarget[2]) > (-1*acceptableHeadingAccuracy))){
             rxArrived = 1;
         }
         else{
@@ -130,6 +130,15 @@ public class Telop_Chassis_Control {
         else{
             return 0;
         }
+    }
+
+    public double[] AllStop(double[] toTarget){
+        toTarget[0]=0;
+        toTarget[1]=0;
+        toTarget[2]=0;
+        return toTarget;
+
+
     }
 
 

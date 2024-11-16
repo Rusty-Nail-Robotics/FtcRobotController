@@ -29,10 +29,35 @@ public class Driver_Control extends LinearOpMode {
             telemetryOutput.Add_Drive_Telem(hardwareMap, this, chassisControl);
 
             if(gamepad1.x){
+                currentPosition=odometery.Read_PinPoint_Position();
                 double[] toTarget = driveToTarget.Drive_Calculation(this, 5,5,0, currentPosition);
-                telemetry.addData("1-Arrived, 0-NotArrived = ", chassisControl.HasArrived(currentPosition, toTarget));
-                if(chassisControl.HasArrived(currentPosition, toTarget) == 0) {
+                telemetry.addData("1-Arrived, 0-NotArrived = ", chassisControl.HasArrived(toTarget));
+
+                while (chassisControl.HasArrived(toTarget) == 0 && gamepad1.x) {
+                    currentPosition = odometery.Read_PinPoint_Position();
+                    toTarget = driveToTarget.Drive_Calculation(this, 5,5,0, currentPosition);
                     chassisControl.AutoDriveSystem(hardwareMap, this, toTarget);
+                    telemetry.addData("1* 1-Arrived, 0-NotArrived = ", chassisControl.HasArrived(toTarget));
+                    telemetryOutput.Add_Odometry_Output(hardwareMap,this,currentPosition);
+                    telemetry.update();
+
+                }
+                chassisControl.AutoDriveSystem(hardwareMap,this,chassisControl.AllStop(toTarget));
+
+                toTarget = driveToTarget.Drive_Calculation(this, 0,7,90, currentPosition);
+                while (chassisControl.HasArrived( toTarget) == 0 && gamepad1.x) {
+                    currentPosition = odometery.Read_PinPoint_Position();
+                    toTarget = driveToTarget.Drive_Calculation(this, 0,7,90, currentPosition);
+                    chassisControl.AutoDriveSystem(hardwareMap, this, toTarget);
+                    telemetry.addData("2* 1-Arrived, 0-NotArrived = ", chassisControl.HasArrived(toTarget));
+                    telemetryOutput.Add_Odometry_Output(hardwareMap,this,currentPosition);
+                    telemetry.update();
+                }
+                chassisControl.AutoDriveSystem(hardwareMap,this,chassisControl.AllStop(toTarget));
+
+                while(gamepad1.x){
+                    currentPosition = odometery.Read_PinPoint_Position();
+                    telemetryOutput.Add_Odometry_Output(hardwareMap,this,currentPosition);
                 }
             }
             else{
