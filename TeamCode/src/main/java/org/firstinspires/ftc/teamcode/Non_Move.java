@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Non_Move {
     public DcMotorEx liftMotor;
-    public Servo ledServo;
     public Servo gripServo;
     public DcMotorEx londonMotor;
     public int liftTarget = 0;
@@ -19,51 +18,52 @@ public class Non_Move {
     public int londonTarget = 0;
 
     void Setup(HardwareMap hardwareMap, LinearOpMode linearOpMode){
-        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        //Lift Motor Setup (ViperSlide)
+        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");          //Match in-program name to item name in robot configuration
+        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);             //Set Motor Off behavior
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                     //Reset Encoder to zero
+        liftMotor.setPower(1);                                                         //Set Maximum power
+        liftMotor.setTargetPosition(liftTarget);                                       //Set the target position (required before Run_To_Position)
+        liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                          //Set motor to run to position (Target)
 
-        londonMotor = hardwareMap.get(DcMotorEx.class, "londonMotor");
-        londonMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        londonMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+        londonMotor = hardwareMap.get(DcMotorEx.class, "londonMotor");      //Match in-program name to item name in robot configuration
+        londonMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);           //Set Motor Off behavior
+        londonMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                   //Reset Encoder to zero
+        londonMotor.setPower(1);                                                       //Set Maximum power
+        londonMotor.setTargetPosition(londonTarget);                                   //Set the target position (required before Run_To_Position)
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
 
 
-        //gripServo = hardwareMap.get(Servo.class, "GripServo");
-        //gripServo.setPosition(0);
+        //gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
+        //gripServo.setPosition(0);                                                     //Set to starting Position
 
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setPower(1);
-        liftMotor.setTargetPosition(liftTarget);
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        londonMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        londonMotor.setPower(1);
-        londonMotor.setTargetPosition(londonTarget);
-        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
+
 
 
 
     }
 
    void Operations(HardwareMap hardwareMap, LinearOpMode linearOpMode){
-        double liftPower = linearOpMode.gamepad1.left_trigger + -linearOpMode.gamepad1.right_trigger;
-       if(liftPower != 0) {
-           liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-           liftMotor.setPower(liftPower);
-           liftMotor.setTargetPosition(liftMotor.getCurrentPosition());
-       }else {
-
-           liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-           liftMotor.setPower(1);
+        double liftPower = linearOpMode.gamepad1.left_trigger + -linearOpMode.gamepad1.right_trigger;   //math to make triggers generate [-1 - 1] value
+       if(liftPower != 0) {                                                        //Check if value is not zero
+           liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
+           liftMotor.setPower(liftPower);                                          //Apply motor power to match trigger inputs
+           liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+       }else {                                                                     //If above value is 0 (no gamepad input)
+           liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                   //Set motor to run to target position
+           liftMotor.setPower(1);                                                  //Allow full power
        }
 
-    if(linearOpMode.gamepad1.left_stick_y != 0) {
-        londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        londonMotor.setVelocity(linearOpMode.gamepad1.left_stick_y*150);
-        londonMotor.setTargetPosition(londonMotor.getCurrentPosition());
-    }else {
-
-        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+    if(linearOpMode.gamepad1.left_stick_y != 0) {                                   //Check if value is not zero (gamepad input)
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
+        londonMotor.setVelocity(linearOpMode.gamepad1.left_stick_y*150);            //Apply motor velocity to match trigger inputs
+        londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+    }else {                                                                         //If above value is 0 (no gamepad input)
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                     //Set motor to run to target position
+        londonMotor.setPower(1);                                                    //Allow full power
     }
 }
 }
