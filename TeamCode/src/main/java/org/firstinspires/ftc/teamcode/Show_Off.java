@@ -19,6 +19,19 @@ public class Show_Off {
     }
 
     void SetLedPattern(HardwareMap hardwareMap, LinearOpMode linearOpMode){
-        blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);    //Set and display pattern on led driver
+        switch(Global_Variables.ledMode){
+            case 1:
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_RED);    //Set and display emergency pattern on led driver
+                break;
+
+            case 2:
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);    //Set and display gripper closed pattern on led driver
+                break;
+
+            case 3:
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);    //Set and display Gripper open pattern on led driver
+                break;
+        }
+
     }
 }

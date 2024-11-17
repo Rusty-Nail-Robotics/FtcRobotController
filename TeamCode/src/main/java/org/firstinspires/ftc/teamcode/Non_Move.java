@@ -17,6 +17,8 @@ public class Non_Move {
     public int liftVelocity = 300;
     public int londonTarget = 0;
 
+    private int xPressed = 0;
+
     void Setup(HardwareMap hardwareMap, LinearOpMode linearOpMode){
         //Lift Motor Setup (ViperSlide)
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");          //Match in-program name to item name in robot configuration
@@ -35,8 +37,8 @@ public class Non_Move {
         londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
 
 
-        //gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
-        //gripServo.setPosition(0);                                                     //Set to starting Position
+        gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
+        gripServo.setPosition(0);                                                     //Set to starting Position
 
 
 
@@ -46,7 +48,7 @@ public class Non_Move {
 
     }
 
-   void Operations(HardwareMap hardwareMap, LinearOpMode linearOpMode){
+   void LiftOperations(HardwareMap hardwareMap, LinearOpMode linearOpMode){
         double liftPower = linearOpMode.gamepad1.left_trigger + -linearOpMode.gamepad1.right_trigger;   //math to make triggers generate [-1 - 1] value
        if(liftPower != 0) {                                                        //Check if value is not zero
            liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
@@ -66,4 +68,24 @@ public class Non_Move {
         londonMotor.setPower(1);                                                    //Allow full power
     }
 }
+
+    void TelopGripperOperations(HardwareMap hardwareMap, LinearOpMode linearOpMode){
+        if (linearOpMode.gamepad1.x){                                                       //when x is pressed
+            if(xPressed == 0){                                                              //Confirm this is the first look while pressed
+                if(gripServo.getPosition() == Global_Variables.gripperOpen)                 //if the gripper is already open
+                    gripServo.setPosition(Global_Variables.gripperClosed);                  //Close the gripper
+                    Global_Variables.ledMode = 2;                                           //Change the lights
+                } else if (gripServo.getPosition() == Global_Variables.gripperClosed) {     //if gripper was not open, but is closed
+                    gripServo.setPosition(Global_Variables.gripperOpen);                    //open the gripper
+                    Global_Variables.ledMode = 3;                                           //Change the lights to match
+            }
+                xPressed = 1;                                                               //Remember that above code has already ran
+
+        }else {                                                                             //if x is released
+            xPressed = 0;                                                                   //Remember that the code needs ran on the next x press
+
+
+        }
+    }
+
 }
