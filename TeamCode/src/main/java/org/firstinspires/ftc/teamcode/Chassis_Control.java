@@ -20,7 +20,7 @@ public class Chassis_Control {
     public double backRightPower = 0;
 
 
-    public void Setup(HardwareMap hardwareMap, LinearOpMode linearOpMode) {
+    public void Setup(HardwareMap hardwareMap, LinearOpMode ignoredLinearOpMode) {
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
@@ -36,7 +36,7 @@ public class Chassis_Control {
 
     }
 
-    public void TelopDrive(HardwareMap hardwareMap, LinearOpMode linearOpMode) {
+    public void TelopDrive(HardwareMap ignoredHardwareMap, LinearOpMode linearOpMode) {
         if (leftFront.isOverCurrent() || rightFront.isOverCurrent() || leftRear.isOverCurrent() || rightRear.isOverCurrent()) {
             Global_Variables.overCurrentOverride = .4;
             Global_Variables.ledMode = 1;
