@@ -26,8 +26,8 @@ public class Chassis_Control {
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        //rightFront.setDirection(DcMotor.Direction.REVERSE);
 
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -47,13 +47,16 @@ public class Chassis_Control {
 
         y = (((-linearOpMode.gamepad1.right_stick_x) * Global_Variables.speedOverride) * overCurrentOverride); // Remember, this is reversed!
         x = (((linearOpMode.gamepad1.right_stick_y) * Global_Variables.speedOverride) * overCurrentOverride); // Counteract imperfect strafing
-        rx = ((((linearOpMode.gamepad1.left_stick_x) * Global_Variables.speedOverride) * 1) * overCurrentOverride);
+        rx = ((((-linearOpMode.gamepad1.left_stick_x) * Global_Variables.speedOverride) * 1) * overCurrentOverride);
+        linearOpMode.telemetry.addData("y = ", y);
+        linearOpMode.telemetry.addData("x = ", x);
+        linearOpMode.telemetry.addData("rx = ", rx);
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        frontLeftPower = (y + x + rx) / denominator;
-        backLeftPower = (y - x + rx) / denominator;
-        frontRightPower = (y - x - rx) / denominator;
-        backRightPower = (y + x - rx) / denominator;
+         frontLeftPower = (y + x - rx) / denominator;
+         backLeftPower = (y - x + rx) / denominator;
+         frontRightPower = (y - x - rx) / denominator;
+         backRightPower = (y + x + rx) / denominator;
 
         leftFront.setPower(frontLeftPower);
         leftRear.setPower(backLeftPower);

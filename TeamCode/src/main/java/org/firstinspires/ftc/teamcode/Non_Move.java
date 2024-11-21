@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -27,6 +28,7 @@ public class Non_Move {
 
         londonMotor = hardwareMap.get(DcMotorEx.class, "londonMotor");      //Match in-program name to item name in robot configuration
         londonMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);           //Set Motor Off behavior
+        londonMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         londonMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                   //Reset Encoder to zero
         londonMotor.setPower(1);                                                       //Set Maximum power
         londonMotor.setTargetPosition(londonTarget);                                   //Set the target position (required before Run_To_Position)
@@ -40,34 +42,79 @@ public class Non_Move {
     }
 
     void LiftOperations(HardwareMap ignoredHardwareMap, LinearOpMode linearOpMode) {
-        double liftPower = linearOpMode.gamepad1.left_trigger - linearOpMode.gamepad1.right_trigger;   //math to make triggers generate [-1 - 1] value
+        if(liftMotor.isOverCurrent()){
+            liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            liftMotor.setPower(0);
+            Global_Variables.ledMode = 1;
+        }
+        double liftPower = linearOpMode.gamepad1.right_trigger - linearOpMode.gamepad1.left_trigger;   //math to make triggers generate [-1 - 1] value
         if (liftPower != 0) {                                                        //Check if value is not zero
-            liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
-            liftMotor.setPower(liftPower);                                          //Apply motor power to match trigger inputs
-            liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+            if(liftMotor.getCurrentPosition() < Global_Variables.viperMax && liftPower > 0) {
+                liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
+                liftMotor.setPower(liftPower);                                          //Apply motor power to match trigger inputs
+                liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+            }
+            else if(liftMotor.getCurrentPosition() > Global_Variables.viperMin && liftPower < 0){
+                liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
+                liftMotor.setPower(liftPower);                                          //Apply motor power to match trigger inputs
+                liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+            }
+            else{
+                liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
+                liftMotor.setPower(0);                                          //Apply motor power to match trigger inputs
+                liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+            }
+            liftMotor.setTargetPosition(liftMotor.getCurrentPosition());
         } else {                                                                     //If above value is 0 (no gamepad input)
+            if(liftMotor.getCurrentPosition() > Global_Variables.viperMax){
+                liftMotor.setTargetPosition(Global_Variables.viperMax);
+            }
+            if(liftMotor.getCurrentPosition() < Global_Variables.viperMin){
+                liftMotor.setTargetPosition(Global_Variables.viperMin);
+            }
             liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                   //Set motor to run to target position
             liftMotor.setPower(1);                                                  //Allow full power
         }
+
+
         double londonInput = linearOpMode.gamepad1.left_stick_y;
         int londonMotorPos = londonMotor.getCurrentPosition();
+        double londonMotorOutput = 0;
+        double lastLondonMotorOutput = 0;
         linearOpMode.telemetry.addData("Current London = ", londonMotorPos);
+        linearOpMode.telemetry.addData("London Cont Input = ", londonInput);
         linearOpMode.telemetry.addData("Viper Position = ", liftMotor.getCurrentPosition());
+        linearOpMode.telemetry.addData("Viper Cont Input = ", liftPower);
         linearOpMode.telemetry.addData("Limit Check = ", CheckLondonLimit(londonMotorPos));
+        linearOpMode.telemetry.addData("London Min =  ", map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMinAtRetraction, Global_Variables.londonMinAtExtention));
+        linearOpMode.telemetry.addData("London Max =  ",map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMaxAtRetraction, Global_Variables.londonMaxAtExtention));
+
         if (londonInput != 0) {                                   //Check if value is not zero (gamepad input)
             if(CheckLondonLimit(londonMotorPos) != 1 && londonInput > 0) {
                 londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
-                londonMotor.setVelocity(linearOpMode.gamepad1.left_stick_y * Global_Variables.londonLiftGain);            //Apply motor velocity to match trigger inputs
-                londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+                londonMotorOutput = (linearOpMode.gamepad1.left_stick_y * Global_Variables.londonLiftGain);            //Apply motor velocity to match trigger inputs
+                //londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
             } else if (CheckLondonLimit(londonMotorPos) != -1 && londonInput < 0) {
                 londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
-                londonMotor.setVelocity(linearOpMode.gamepad1.left_stick_y * Global_Variables.londonLowerGain);            //Apply motor velocity to match trigger inputs
+                londonMotorOutput = (linearOpMode.gamepad1.left_stick_y * Global_Variables.londonLowerGain);            //Apply motor velocity to match trigger inputs
+                //londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+            }else{
+                londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
+                londonMotor.setVelocity(0);            //Apply motor velocity to match trigger inputs
                 londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
-            }
 
+            }
+            if(lastLondonMotorOutput != londonMotorOutput){
+                londonMotor.setVelocity(londonMotorOutput);
+                lastLondonMotorOutput = londonMotorOutput;
+            }
+            londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
         } else {                                                                         //If above value is 0 (no gamepad input)
-            if(CheckLondonLimit(londonMotorPos) < 0){
-                londonMotor.setTargetPosition((int)map(londonMotorPos, Global_Variables.londonMinAtRetraction, Global_Variables.londonMinAtExtention, Global_Variables.viperMin, Global_Variables.viperMax));
+            if(CheckLondonLimit(londonMotorPos) == 1){
+                londonMotor.setTargetPosition(Global_Variables.londonMaxAtExtention);
+            }
+            if(CheckLondonLimit(londonMotorPos) == -1){
+                londonMotor.setTargetPosition(Global_Variables.londonMinAtExtention);
             }
             londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                     //Set motor to run to target position
             londonMotor.setPower(1);                                                    //Allow full power
@@ -75,10 +122,13 @@ public class Non_Move {
     }
 
     int CheckLondonLimit(int currentPos){
-        if(currentPos < ( map(currentPos, Global_Variables.londonMinAtRetraction, Global_Variables.londonMinAtExtention, Global_Variables.viperMin, Global_Variables.viperMax))){
+        int londonMin = Global_Variables.londonMinAtExtention;//(int)map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMinAtRetraction, Global_Variables.londonMinAtExtention);
+        int londonMax = Global_Variables.londonMaxAtExtention; //(int)map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMaxAtRetraction, Global_Variables.londonMaxAtExtention);
+
+        if(currentPos < londonMin){
             return -1;
         }
-        if(currentPos > ( map(currentPos, Global_Variables.londonMaxAtRetraction, Global_Variables.londonMaxAtExtention, Global_Variables.viperMin, Global_Variables.viperMax))){
+        if(currentPos > londonMax){
             return 1;
         }else{
             return 0;
@@ -97,13 +147,13 @@ public class Non_Move {
                     Global_Variables.ledMode = 3;                                           //Change the lights to match
                 }
                 xPressed = 1;                                                               //Remember that above code has already ran
-
+            }
             } else {                                                                             //if x is released
                 xPressed = 0;                                                                   //Remember that the code needs ran on the next x press
 
 
             }
-        }
+
 
     }
 
