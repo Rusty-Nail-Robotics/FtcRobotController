@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 public class Global_Variables {
      //General values
-     static double speedOverride = .5;
+     static double speedOverride = .25;
+     static double speedOverrideSlow = .25;
+     static double highSpeed = 1;
      static double overCurrentOverride = 0.4;
-     static double gripperOpen = 0;
-     static double gripperClosed = 1;
+     static double gripperOpen = 1;
+     static double gripperClosed = 0;
      static int ledMode = 0;
      static double londonLiftGain = 750;
      static double londonLowerGain = 450;

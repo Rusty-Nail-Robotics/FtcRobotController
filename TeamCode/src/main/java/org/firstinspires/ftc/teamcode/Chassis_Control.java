@@ -43,6 +43,11 @@ public class Chassis_Control {
         } else {
             overCurrentOverride = 1;
         }
+        if(linearOpMode.gamepad1.right_bumper){
+            Global_Variables.speedOverride = Global_Variables.highSpeed;
+        }else {
+            Global_Variables.speedOverride = Global_Variables.speedOverrideSlow;
+        }
 
 
         y = (((-linearOpMode.gamepad1.right_stick_x) * Global_Variables.speedOverride) * overCurrentOverride); // Remember, this is reversed!

@@ -36,7 +36,7 @@ public class Non_Move {
 
 
         gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
-        gripServo.setPosition(0);                                                     //Set to starting Position
+        gripServo.setPosition(Global_Variables.gripperOpen);                                                     //Set to starting Position
 
 
     }

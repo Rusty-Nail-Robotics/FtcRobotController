@@ -20,12 +20,15 @@ public class Show_Off {
 
     void SetLedPattern(HardwareMap ignoredHardwareMap, LinearOpMode ignoredLinearOpMode){
         switch(Global_Variables.ledMode){
+            case 0:
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE);    //Set and display emergency pattern on led driver
+                break;
             case 1:
                 blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_RED);    //Set and display emergency pattern on led driver
                 break;
 
             case 2:
-                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);    //Set and display gripper closed pattern on led driver
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);    //Set and display gripper closed pattern on led driver
                 break;
 
             case 3:
