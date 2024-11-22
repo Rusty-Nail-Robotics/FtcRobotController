@@ -30,7 +30,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import java.util.Locale;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 /*
 This opmode shows how to use the goBILDA® Pinpoint Odometry Computer.
 The goBILDA Odometry Computer is a device designed to solve the Pose Exponential calculation
@@ -58,7 +58,7 @@ For support, contact tech@gobilda.com
  */
 
 @TeleOp(name="goBILDA® PinPoint Odometry Example", group="Linear OpMode")
-//@Disabled
+@Disabled
 
 public class SensorGoBildaPinpointExample extends LinearOpMode {
 
