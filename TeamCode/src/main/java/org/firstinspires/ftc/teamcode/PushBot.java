@@ -105,7 +105,7 @@ public class PushBot extends OpMode{
         double left;
         double right;
         double y = gamepad1.right_stick_y;
-        double rx = gamepad1.left_stick_x * .25;
+        double rx = gamepad1.left_stick_x * .50;
         // Run wheels in tank mode (note: The joystick goes negative when pushed forward, so negate it)
         left = rx - y;
         right = rx + y;
