@@ -19,6 +19,7 @@ public class Non_Move {
     void Setup(HardwareMap hardwareMap, LinearOpMode ignoredLinearOpMode) {
         //Lift Motor Setup (ViperSlide)
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");          //Match in-program name to item name in robot configuration
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);             //Set Motor Off behavior
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                     //Reset Encoder to zero
         liftMotor.setPower(1);                                                         //Set Maximum power
@@ -58,6 +59,7 @@ public class Non_Move {
                 liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
                 liftMotor.setPower(liftPower);                                          //Apply motor power to match trigger inputs
                 liftMotor.setTargetPosition(liftMotor.getCurrentPosition());            //Set the motor target to wherever it is now
+
             }
             else{
                 liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
@@ -88,11 +90,21 @@ public class Non_Move {
         linearOpMode.telemetry.addData("Limit Check = ", CheckLondonLimit(londonMotorPos));
         linearOpMode.telemetry.addData("London Min =  ", map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMinAtRetraction, Global_Variables.londonMinAtExtention));
         linearOpMode.telemetry.addData("London Max =  ",map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, Global_Variables.londonMaxAtRetraction, Global_Variables.londonMaxAtExtention));
+        if(linearOpMode.gamepad1.left_bumper){
+            londonMotor.setTargetPosition(Global_Variables.londonLiftTarget);
+            londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                     //Set motor to run to target position
+            londonMotor.setPower(1);                                                    //Allow full power
 
+            //londonMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //londonMotor.setPower(0);
+            //londonMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+        if(!linearOpMode.gamepad1.left_bumper){
         if (londonInput != 0) {                                   //Check if value is not zero (gamepad input)
             if(CheckLondonLimit(londonMotorPos) != 1 && londonInput > 0) {
                 londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
                 londonMotorOutput = (linearOpMode.gamepad1.left_stick_y * Global_Variables.londonLiftGain);            //Apply motor velocity to match trigger inputs
+
                 //londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
             } else if (CheckLondonLimit(londonMotorPos) != -1 && londonInput < 0) {
                 londonMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);                   //Set motor to run at velocity
@@ -119,6 +131,8 @@ public class Non_Move {
             londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                     //Set motor to run to target position
             londonMotor.setPower(1);                                                    //Allow full power
         }
+    }
+
     }
 
     int CheckLondonLimit(int currentPos){
