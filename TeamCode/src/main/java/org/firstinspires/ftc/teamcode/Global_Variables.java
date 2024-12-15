@@ -17,8 +17,9 @@ public class Global_Variables {
      static int londonMinAtRetraction = 248;
      static int londonMaxAtExtention = 1300;
      static int londonMaxAtRetraction = -1300;
-     static int viperMax = 3000;
+     static int viperMax = 3000*2;
      static int viperMin = 0;
+     static int londonLiftTarget = 1045;
 
 
      //Autonumous values
