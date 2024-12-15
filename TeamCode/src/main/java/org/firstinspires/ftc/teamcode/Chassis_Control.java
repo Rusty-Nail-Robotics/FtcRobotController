@@ -10,6 +10,8 @@ public class Chassis_Control {
     public DcMotorEx leftRear;
     public DcMotorEx rightRear;
     public DcMotorEx rightFront;
+
+
     public double overCurrentOverride = 1;
     public double y = 0;
     public double x = 0;
@@ -43,6 +45,8 @@ public class Chassis_Control {
         } else {
             overCurrentOverride = 1;
         }
+
+
         if(linearOpMode.gamepad1.right_bumper){
             Global_Variables.speedOverride = Global_Variables.highSpeed;
         }else {
@@ -53,6 +57,8 @@ public class Chassis_Control {
         y = (((-linearOpMode.gamepad1.right_stick_x) * Global_Variables.speedOverride) * overCurrentOverride); // Remember, this is reversed!
         x = (((linearOpMode.gamepad1.right_stick_y) * Global_Variables.speedOverride) * overCurrentOverride); // Counteract imperfect strafing
         rx = ((((-linearOpMode.gamepad1.left_stick_x) * Global_Variables.speedOverride) * 1) * overCurrentOverride);
+
+
         linearOpMode.telemetry.addData("y = ", y);
         linearOpMode.telemetry.addData("x = ", x);
         linearOpMode.telemetry.addData("rx = ", rx);
@@ -67,6 +73,7 @@ public class Chassis_Control {
         leftRear.setPower(backLeftPower);
         rightFront.setPower(frontRightPower);
         rightRear.setPower(backRightPower);
+
 
 
     }

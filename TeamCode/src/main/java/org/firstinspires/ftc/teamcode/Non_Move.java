@@ -47,7 +47,9 @@ public class Non_Move {
             liftMotor.setPower(0);
             Global_Variables.ledMode = 1;
         }
+
         double liftPower = linearOpMode.gamepad1.right_trigger - linearOpMode.gamepad1.left_trigger;   //math to make triggers generate [-1 - 1] value
+
         if (liftPower != 0) {                                                        //Check if value is not zero
             if(liftMotor.getCurrentPosition() < Global_Variables.viperMax && liftPower > 0) {
                 liftMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);               //Set motor to run with power setting
@@ -81,6 +83,8 @@ public class Non_Move {
         int londonMotorPos = londonMotor.getCurrentPosition();
         double londonMotorOutput = 0;
         double lastLondonMotorOutput = 0;
+
+
         linearOpMode.telemetry.addData("Current London = ", londonMotorPos);
         linearOpMode.telemetry.addData("London Cont Input = ", londonInput);
         linearOpMode.telemetry.addData("Viper Position = ", liftMotor.getCurrentPosition());
@@ -106,7 +110,7 @@ public class Non_Move {
             }
             if(lastLondonMotorOutput != londonMotorOutput){
                 londonMotor.setVelocity(londonMotorOutput);
-                lastLondonMotorOutput = londonMotorOutput;
+                //lastLondonMotorOutput = londonMotorOutput;
             }
             londonMotor.setTargetPosition(londonMotor.getCurrentPosition());            //Set the motor target to wherever it is now
         } else {                                                                         //If above value is 0 (no gamepad input)

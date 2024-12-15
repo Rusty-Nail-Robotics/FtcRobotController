@@ -29,6 +29,7 @@ public class Drive extends LinearOpMode {
             chassisControl.TelopDrive(hardwareMap, this);   //Run the TelopDrive function in Chassis_Control
             non_move.TelopGripperOperations(hardwareMap, this);     // Run the TelopGripperOperations function in Non_Move
             telemetry.update();
+
         }
     }
 
