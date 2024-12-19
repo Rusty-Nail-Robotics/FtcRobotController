@@ -11,6 +11,7 @@ public class Global_Variables {
      static int ledMode = 0;
      static double londonLiftGain = 750;
      static double londonLowerGain = 450;
+     static int basketMode = 0;
 
      //Min/Max locations for lift/extention
      static int londonMinAtExtention = -248;
@@ -20,6 +21,11 @@ public class Global_Variables {
      static int viperMax = 3000*2;
      static int viperMin = 0;
      static int londonLiftTarget = 1045;
+     static int minBeforeExt = 150;
+     static int basketLondonTarget = 200;
+     static int basketLiftTarget = 6000;
+     static int maxViperUnderMinBeforeLift = 3000;
+
 
 
      //Autonumous values
