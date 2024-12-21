@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 /*
  * This OpMode executes a Tank Drive control TeleOp a direct drive robot
@@ -50,24 +51,23 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name="PushBot")
 //@Disabled
-public class PushBot extends OpMode{
+public class PushBot extends OpMode {
 
     /* Declare OpMode members. */
-    public DcMotorEx  leftDrive   = null;
-    public DcMotorEx  rightDrive  = null;
-
-
-
+    public DcMotorEx leftDrive = null;
+    public DcMotorEx rightDrive = null;
+    public Servo gripServo;
+    public DcMotorEx frontleftDrive;
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
         // Define and Initialize Motors
-        leftDrive  = hardwareMap.get(DcMotorEx.class, "left_drive");
+        leftDrive = hardwareMap.get(DcMotorEx.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotorEx.class, "right_drive");
-
-
+        gripServo = hardwareMap.get(Servo.class, "Test servo 0");
+        frontleftDrive = hardwareMap.get(DcMotorEx.class, "frontleftDrive");
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left and right sticks forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
@@ -75,8 +75,8 @@ public class PushBot extends OpMode{
         //rightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
-         leftDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-         rightDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        leftDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
 
         // Send telemetry message to signify robot waiting;
@@ -102,19 +102,28 @@ public class PushBot extends OpMode{
      */
     @Override
     public void loop() {
+    gripServo.setPosition(gamepad1.left_stick_y);
         double left;
         double right;
-        double y = gamepad1.right_stick_y *.5 ;
-        double rx = gamepad1.left_stick_x * .50 *.25;
+        double y = gamepad1.right_stick_y * Global_Variables.speedOverride;
+        double rx = gamepad1.left_stick_x * Global_Variables.speedOverride * .75;
         // Run wheels in tank mode (note: The joystick goes negative when pushed forward, so negate it)
         left = rx - y;
         right = rx + y;
 
         leftDrive.setVelocity(left * 2000);
         rightDrive.setVelocity(right * 2000);
+        frontleftDrive.setVelocity(left * 2000);
+
+        if (gamepad1.right_bumper || gamepad1.left_bumper) {
+            Global_Variables.speedOverride = Global_Variables.speedOverrideSlow;
+        } else {
+            Global_Variables.speedOverride = Global_Variables.highSpeed;
+        }
+
+    }
 
 
-   }
 
     /*
      * Code to run ONCE after the driver hits STOP
@@ -123,3 +132,4 @@ public class PushBot extends OpMode{
     public void stop() {
     }
 }
+
