@@ -18,6 +18,7 @@ public class Non_Move {
 
     void Setup(HardwareMap hardwareMap, LinearOpMode ignoredLinearOpMode) {
         //Lift Motor Setup (ViperSlide)
+        Global_Variables.basketMode = 0;
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");          //Match in-program name to item name in robot configuration
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);             //Set Motor Off behavior
@@ -45,33 +46,61 @@ public class Non_Move {
     void LiftOperations(HardwareMap ignoredHardwareMap, LinearOpMode linearOpMode) {
         if(linearOpMode.gamepad1.dpad_up){
             Global_Variables.basketMode = 1;
+        } else if (linearOpMode.gamepad1.dpad_down) {
+            Global_Variables.basketMode = 2;
         }
 
 
         switch (Global_Variables.basketMode){
             case 0:
-                linearOpMode.telemetry.addData("Manual Mode", 1);
-                break;
+
+                    linearOpMode.telemetry.addData("Manual Mode", 1);
+                    break;
 
             case 1:
-                if(londonMotor.getCurrentPosition() < Global_Variables.minBeforeExt){
-                    londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
-                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    londonMotor.setPower(1);
-                }else{
-                    londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
-                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    londonMotor.setPower(1);
-                    liftMotor.setTargetPosition(Global_Variables.basketLiftTarget);
-                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    liftMotor.setPower(1);
-                }
-                if(linearOpMode.gamepad1.left_stick_y != 0 || linearOpMode.gamepad1.dpad_down || linearOpMode.gamepad1.left_trigger != 0 || linearOpMode.gamepad1.right_trigger != 0){
-                    Global_Variables.basketMode = 0;
-            }
+
+                    if (londonMotor.getCurrentPosition() <= Global_Variables.minBeforeExt) {
+                        londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
+                        londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        londonMotor.setPower(1);
+                    } else {
+                        londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
+                        londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        londonMotor.setPower(1);
+                        liftMotor.setTargetPosition(Global_Variables.basketLiftTarget);
+                        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        liftMotor.setPower(1);
+                    }
+                    if (linearOpMode.gamepad1.left_stick_y != 0 || linearOpMode.gamepad1.left_trigger != 0 || linearOpMode.gamepad1.right_trigger != 0) {
+                        Global_Variables.basketMode = 0;
+                    }
+                    linearOpMode.telemetry.addData("Basket Height Mode", 1);
+                    break;
+
+            case 2:
+
+                    if (liftMotor.getCurrentPosition() >= Global_Variables.maxViperUnderMinBeforeLift) {
+                        liftMotor.setTargetPosition(Global_Variables.fastDownLiftTarget);
+                        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        liftMotor.setPower(1);
+                    } else {
+                        liftMotor.setTargetPosition(Global_Variables.fastDownLiftTarget);
+                        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        liftMotor.setPower(1);
+                        londonMotor.setTargetPosition(Global_Variables.fastDownLondonTarget);
+                        londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        londonMotor.setPower(.25);
+                    }
+                    if (linearOpMode.gamepad1.left_stick_y != 0 || linearOpMode.gamepad1.left_trigger != 0 || linearOpMode.gamepad1.right_trigger != 0) {
+                        Global_Variables.basketMode = 0;
+                    }
+                    linearOpMode.telemetry.addData("Fast Down Mode", 1);
+                    break;
+
 
         }
-
+        linearOpMode.telemetry.addData("Lift Pos (Viper) = ", liftMotor.getCurrentPosition());
+        linearOpMode.telemetry.addData("London Pos = ", londonMotor.getCurrentPosition());
         if (londonMotor.getCurrentPosition()<Global_Variables.minBeforeExt && liftMotor.getCurrentPosition() > Global_Variables.maxViperUnderMinBeforeLift){
             liftMotor.setTargetPosition(Global_Variables.maxViperUnderMinBeforeLift);
             liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
