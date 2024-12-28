@@ -16,15 +16,15 @@ public class Global_Variables {
      //Min/Max locations for lift/extention
      static int londonMinAtExtention = -248;
 
-     static int londonMaxAtExtention = 1300;
+     static int londonMaxAtExtention = 950;
 
-     static int viperMax = 3000;
+     static int viperMax = 4600;
      static int viperMin = 10;
      static int minBeforeExt = 600; //london motor location where 3rd stage of viper slid can come out
-     static int basketLondonTarget = 800;
-     static int basketLiftTarget = 3000;
-     static int maxViperUnderMinBeforeLift = 2500;
-     static int fastDownLiftTarget = maxViperUnderMinBeforeLift-50;  //where to retract arm to when down arrow is pressed
+     static int basketLondonTarget = 900;
+     static int basketLiftTarget = 4600;
+     static int maxViperUnderMinBeforeLift = 3750;
+     static int fastDownLiftTarget = 25;  //where to retract arm to when down arrow is pressed
      static int fastDownLondonTarget = 0;
 
 

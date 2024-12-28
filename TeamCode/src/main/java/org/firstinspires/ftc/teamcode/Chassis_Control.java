@@ -46,11 +46,11 @@ public class Chassis_Control {
             overCurrentOverride = 1;
         }
 
-        if(linearOpMode.gamepad1.left_stick_button || linearOpMode.gamepad1.right_stick_button){
+        if(linearOpMode.gamepad1.right_bumper){
             Global_Variables.speedOverride = Global_Variables.speedOverrideSlow;
-        }else {
-            Global_Variables.speedOverride = Global_Variables.highSpeed;
-        }
+        }//else {
+           // Global_Variables.speedOverride = Global_Variables.highSpeed;
+        //}
 
 
 

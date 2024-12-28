@@ -54,9 +54,10 @@ public class Non_Move {
 
         if(linearOpMode.gamepad1.dpad_up){
             Global_Variables.basketMode = 1;
-        } else if (linearOpMode.gamepad1.dpad_down) {
+        } else if (linearOpMode.gamepad1.dpad_down || linearOpMode.gamepad1.right_stick_button || linearOpMode.gamepad1.left_bumper) {
             Global_Variables.basketMode = 2;
         }
+        Global_Variables.speedOverride = map(liftMotor.getCurrentPosition(), Global_Variables.viperMin, Global_Variables.viperMax, 1,.25);
 
 
         switch (Global_Variables.basketMode){
