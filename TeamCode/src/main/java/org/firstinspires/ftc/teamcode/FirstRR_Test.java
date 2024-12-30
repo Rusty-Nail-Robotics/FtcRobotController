@@ -16,16 +16,18 @@ import org.firstinspires.ftc.teamcode.TankDrive;
 public final class FirstRR_Test extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d beginPose = new Pose2d(-36, -60, 90);
+        Pose2d beginPose = new Pose2d(-36, -60, Math.toRadians(90));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
 
 
         waitForStart();
-        while (1 == 1) {
+        while (1 == 1 && !isStopRequested()) {
             Action TrajectoryAction2 = drive.actionBuilder(drive.pose)
-                    .splineTo(new Vector2d(0, 0), Math.toRadians(90))
+                    //.lineTo(new Vector2d(0, 0), Math.toRadians(90))
+                    //.splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(90))
+                    .strafeToLinearHeading(new Vector2d(0, 0), Math.toRadians(90))
                     .build();
 
 
@@ -35,7 +37,10 @@ public final class FirstRR_Test extends LinearOpMode {
                     )
             );
             Action TrajectoryAction3 = drive.actionBuilder(drive.pose)
-                    .splineTo(new Vector2d(-36, -60), Math.toRadians(90))
+                    //.splineTo(new Vector2d(-36, -60), Math.toRadians(90))
+                    //.splineToConstantHeading(new Vector2d(-36, -60), Math.toRadians(90))
+                    //.strafeTo(new Vector2d(-36, -60))
+                    .strafeToLinearHeading(new Vector2d(-36, -60), Math.toRadians(90))
                     .build();
             Actions.runBlocking(
                     new SequentialAction(

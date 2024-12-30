@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,19 +11,36 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Non_Move {
     public DcMotorEx liftMotor;
+    public DcMotorEx londonStartPositioner;
     public Servo gripServo;
     public DcMotorEx londonMotor;
     public DigitalChannel viperMinMagSwitch;
+    public RevTouchSensor londonHomeSwitch;
     public int liftTarget = 0;
     public int londonTarget = 0;
     private double liftPower = 0;
     private int xPressed = 0;
     private double londonInput = 0;
     private double lastLondonMotorOutput = 0;
+    public int londonPositionerPark = 0;
+    public int londonPosionerRetracted = -72;
 
     void Setup(HardwareMap hardwareMap, LinearOpMode linearOpMode) {
         //Lift Motor Setup (ViperSlide)
         Global_Variables.basketMode = 0;
+        gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
+        gripServo.setPosition(Global_Variables.gripperClosed);                                                     //Set to starting Position
+
+        londonStartPositioner = hardwareMap.get(DcMotorEx.class, "Lift Start Positioner");
+        londonStartPositioner.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);             //Set Motor Off behavior
+        londonStartPositioner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                     //Reset Encoder to zero
+        londonStartPositioner.setPower(1);                                                         //Set Maximum power
+        londonStartPositioner.setTargetPosition(londonPositionerPark);                                       //Set the target position (required before Run_To_Position)
+        londonStartPositioner.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                          //Set motor to run to position (Target)
+
+        londonHomeSwitch = hardwareMap.get(RevTouchSensor.class, "London Home");                        //Match in-program name to item name in robot configuration
+
+
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");          //Match in-program name to item name in robot configuration
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);             //Set Motor Off behavior
@@ -41,8 +59,30 @@ public class Non_Move {
         londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
 
 
-        gripServo = hardwareMap.get(Servo.class, "GripServo");                        //Match in-program name to item name in robot configuration
-        gripServo.setPosition(Global_Variables.gripperOpen);                                                     //Set to starting Position
+        londonMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        londonMotor.setPower(.25);
+        //londonMotor.setVelocity(.7);
+        while(londonHomeSwitch.isPressed()){
+            linearOpMode.telemetry.addData("Homing London Motor", londonHomeSwitch.isPressed());
+            linearOpMode.telemetry.update();
+        }
+        londonMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);                     //Reset Encoder to zero
+        linearOpMode.telemetry.addData("Done Homing", londonHomeSwitch.isPressed());
+        linearOpMode.telemetry.update();
+        //londonMotor.setVelocity(0);
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
+        londonMotor.setPower(1);                                                       //Set Maximum power
+        londonMotor.setTargetPosition(londonTarget);                                   //Set the target position (required before Run_To_Position)
+
+
+
+        londonStartPositioner.setTargetPosition(londonPosionerRetracted);
+        while(londonStartPositioner.isBusy()){
+
+        }
+        londonStartPositioner.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        londonStartPositioner.setPower(0);
+
         viperMinMagSwitch = hardwareMap.get(DigitalChannel.class, "Viper min sensor");                        //Match in-program name to item name in robot configuration
 
 
@@ -62,6 +102,9 @@ public class Non_Move {
 
         switch (Global_Variables.basketMode){
             case 0:
+                if(linearOpMode.gamepad1.y){
+                    ParkLondon();
+                }
                 liftPower = linearOpMode.gamepad1.right_trigger - linearOpMode.gamepad1.left_trigger;   //math to make triggers generate [-1 - 1] value
                 londonInput = linearOpMode.gamepad1.left_stick_y;
                 ManualLiftControl();
@@ -124,6 +167,63 @@ public class Non_Move {
 
 
 
+    }
+
+    void AutoLiftOperations(LinearOpMode linearOpMode){
+        switch (Global_Variables.basketMode){
+
+            case 1:
+
+                if (londonMotor.getCurrentPosition() <= Global_Variables.minBeforeExt) {
+                    londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
+                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    londonMotor.setPower(1);
+                } else {
+                    londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
+                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    londonMotor.setPower(1);
+                    liftMotor.setTargetPosition(Global_Variables.basketLiftTarget);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftMotor.setPower(1);
+                }
+                linearOpMode.telemetry.addData("Basket Height Mode", 1);
+                break;
+
+            case 2:
+
+                if (liftMotor.getCurrentPosition() >= Global_Variables.maxViperUnderMinBeforeLift) {
+                    liftMotor.setTargetPosition(Global_Variables.fastDownLiftTarget);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftMotor.setPower(1);
+                } else {
+                    liftMotor.setTargetPosition(Global_Variables.fastDownLiftTarget);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftMotor.setPower(1);
+                    londonMotor.setTargetPosition(Global_Variables.fastDownLondonTarget);
+                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    londonMotor.setPower(.25);
+                }
+                linearOpMode.telemetry.addData("Fast Down Mode", 1);
+                break;
+
+            case 3:
+                if (londonMotor.getCurrentPosition() >= Global_Variables.minBeforeExt && liftMotor.getCurrentPosition() >= Global_Variables.maxViperUnderMinBeforeLift) {
+                    liftMotor.setTargetPosition(Autonomous_Variables.subDeliverLiftTarget);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftMotor.setPower(1);
+                }else {
+                    liftMotor.setTargetPosition(Autonomous_Variables.subDeliverLiftTarget);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftMotor.setPower(1);
+                    londonMotor.setTargetPosition(Autonomous_Variables.subDeliverLondonTarget);
+                    londonMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    londonMotor.setPower(1);
+                }
+                linearOpMode.telemetry.addData("Auto Sub Mode", 1);
+                break;
+
+
+        }
     }
 
     void ManualLondonControl(){
@@ -262,6 +362,33 @@ public class Non_Move {
 
 
             }
+
+
+    }
+
+    void ParkLondon(){
+        liftMotor.setPower(1);                                                         //Set Maximum power
+        liftMotor.setTargetPosition(Global_Variables.viperMin);                                       //Set the target position (required before Run_To_Position)
+        liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                          //Set motor to run to position (Target)
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
+        londonMotor.setPower(.1);                                                       //Set Maximum power
+        londonMotor.setTargetPosition(50);                                   //Set the target position (required before Run_To_Position)
+        londonStartPositioner.setPower(.2);                                                         //Set Maximum power
+        londonStartPositioner.setTargetPosition(londonPositionerPark+5);                                       //Set the target position (required before Run_To_Position)
+        londonStartPositioner.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                          //Set motor to run to position (Target)
+        while(londonStartPositioner.isBusy() || liftMotor.isBusy() || londonMotor.isBusy() || londonStartPositioner.getCurrentPosition() < (londonPosionerRetracted * .25)){
+
+        }
+        londonStartPositioner.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        londonStartPositioner.setPower(0);
+        londonMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);                        //Set motor to run to position (Target)
+        londonMotor.setPower(.1);                                                       //Set Maximum power
+        londonMotor.setTargetPosition(0);                                   //Set the target position (required before Run_To_Position)
+
+        londonMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        londonMotor.setPower(0);
+
+
 
 
     }
