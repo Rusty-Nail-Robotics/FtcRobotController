@@ -23,4 +23,15 @@ public class Autonomous_Variables {
 
     public static double[] safe_Pivot_Point = {-46,-46};
     public static double[] place_In_Basket_Location = {-48,-48,225};
+
+    /////////////////// Non Basket Side //////////////////////
+    public static double[] getSub_Spec_Set_Location_Right = {10,-36,90};
+    public static double[] jump_Point_1 = {36,-36,180};
+    public static double[] jump_Point_2 = {48,-18,180};
+    public static double[] push_Point_1 = {48,-56,180};
+    public static double[] jump_Point_3 = {60,-18,180};
+    public static double[] push_Point_2 = {60,-56,180};
+    public static double[] jump_Point_4 = {68,-18,-180};
+    public static double[] push_Point_3 = {68,-56,180};
+    public static double[] clip_Grab_Point = {20,-60,0};
 }
