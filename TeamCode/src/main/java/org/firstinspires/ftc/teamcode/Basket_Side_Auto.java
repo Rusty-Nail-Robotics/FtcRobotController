@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,16 +16,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @Autonomous(name = "Basket Side")//Set Program Name and Mode
+
 public final class Basket_Side_Auto extends LinearOpMode {
+
     Non_Move non_move = new Non_Move();
     ElapsedTime gameTime = new ElapsedTime();
     ElapsedTime gpTimer = new ElapsedTime();
+    RevBlinkinLedDriver blinkinLedDriver;           //create container holding the led driver info
 
 
     @Override
 
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {// Removed this to clear an error " throws InterruptedException { "
         Pose2d beginPose = new Pose2d(-36, -60, Math.toRadians(90));
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "ledServo");  //Associate in-program name with robot configuration name
 
         non_move.Setup(hardwareMap, this);               //run the setup function in Non_Move
         Show_Off showOff = new Show_Off();                          //Create the container named showoff
@@ -38,12 +43,13 @@ public final class Basket_Side_Auto extends LinearOpMode {
 
             //// Place on High Chamber//
         Action StartToSub = drive.actionBuilder(drive.pose)
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget,.5))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget,1))
+                .stopAndAdd(new LedControl(blinkinLedDriver,0))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget, .5))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget, 1))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.sub_Spec_Set_Location[0], Autonomous_Variables.sub_Spec_Set_Location[1]), Math.toRadians(Autonomous_Variables.sub_Spec_Set_Location[2]))
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget - Autonomous_Variables.subDeliverLondonDropDistance,1))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget - Autonomous_Variables.subDeliverLondonDropDistance, 1))
                 //.waitSeconds(.25)
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget - Autonomous_Variables.subDeliverRetractionDistance,1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget - Autonomous_Variables.subDeliverRetractionDistance, 1))
                 .waitSeconds(.25)
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 //.waitSeconds(.15)
@@ -60,8 +66,8 @@ public final class Basket_Side_Auto extends LinearOpMode {
 
 
         Action PickInnerFromFloor = drive.actionBuilder(drive.pose)
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.fastDownLiftTarget,1))
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.fastDownLondonTarget,.25))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.fastDownLiftTarget, 1))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.fastDownLondonTarget, .25))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Inner_Location[0], Autonomous_Variables.pick_From_Ground_Inner_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Inner_Location[2]))
                 .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .waitSeconds(.5)
@@ -70,8 +76,9 @@ public final class Basket_Side_Auto extends LinearOpMode {
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
                 .waitSeconds(.25)
                 .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.maxViperUnderMinBeforeLift, 1))
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget, 1))
                 .turnTo(Math.toRadians(225))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
                 .waitSeconds(.35)
@@ -89,19 +96,19 @@ public final class Basket_Side_Auto extends LinearOpMode {
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
                 .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Center_Location[0], Autonomous_Variables.pick_From_Ground_Center_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Center_Location[2]))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget,1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .waitSeconds(.5)
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget,.35))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget, .35))
                 .waitSeconds(1.5)
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
-                .waitSeconds(.5)
+                .waitSeconds(.25)
                 .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.maxViperUnderMinBeforeLift, 1))
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget, 1))
                 .turnTo(Math.toRadians(225))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
-                .waitSeconds(1)
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
-                .waitSeconds(.5)
+                .waitSeconds(.35)
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 .build();
         Actions.runBlocking(
@@ -118,21 +125,20 @@ public final class Basket_Side_Auto extends LinearOpMode {
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
                 .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Outer_Location[0], Autonomous_Variables.pick_From_Ground_Outer_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Outer_Location[2]))
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget+50, .35))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget + 50, .35))
                 .waitSeconds(1.5)
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget+Autonomous_Variables.getPickOuterExtraReach, 1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget + Autonomous_Variables.getPickOuterExtraReach, 1))
                 .waitSeconds(.75)
                 .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget, .35))
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
-                .waitSeconds(.5)
-                .waitSeconds(.5)
+                .waitSeconds(.25)
                 .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.maxViperUnderMinBeforeLift, 1))
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget, 1))
                 .turnTo(Math.toRadians(225))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
-                .waitSeconds(1)
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
-                .waitSeconds(.5)
+                .waitSeconds(.35)
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 .build();
         Actions.runBlocking(
@@ -164,20 +170,11 @@ public final class Basket_Side_Auto extends LinearOpMode {
     }
 
 
-    public void WaitSeconds(double seconds) {
-        gpTimer.reset();
-        while (gpTimer.seconds() < seconds && !isStopRequested()) {
-            telemetry.update();
-            //Do Nothing
-        }
-    }
 
-    Action RetractLift(){
-        non_move.liftMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLiftTarget);
-        return RetractLift();
-    }
 
-  public class MotorTarget implements Action{
+
+
+  public static class MotorTarget implements Action{  //made static to clear error
         DcMotorEx motor;
         int target;
         double power;
@@ -194,7 +191,7 @@ public final class Basket_Side_Auto extends LinearOpMode {
           return false;
       }
   }
-    public class ServoTarget implements Action{
+    public static class ServoTarget implements Action{ //made static to clear error
         Servo servo;
         double target;
 
@@ -209,6 +206,54 @@ public final class Basket_Side_Auto extends LinearOpMode {
             servo.setPosition(target);
             return false;
         }
+    }
+
+    public static class LedControl implements Action { //made static to clear error
+        RevBlinkinLedDriver ledDriver;
+        int mode;
+
+
+        public LedControl(RevBlinkinLedDriver ledDriver, int mode) {
+            this.ledDriver = ledDriver;
+            this.mode = mode;
+
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            switch (Global_Variables.ledMode) {
+                case 0:
+                    ledDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
+                case 1:
+                    ledDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_RED);
+            }
+
+            return false;
+        }
+
+    }
+        public static class CheckLiftLimit implements Action{ //made static to clear error
+            DcMotorEx lift;
+            DcMotorEx london;
+            RevBlinkinLedDriver ledDriver;
+
+
+            public CheckLiftLimit(RevBlinkinLedDriver ledDriver, DcMotorEx lift, DcMotorEx london){
+                this.london = london;
+                this.lift = lift;
+                this.ledDriver = ledDriver;
+
+            }
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                if(london.getCurrentPosition() < Global_Variables.minBeforeExt && lift.getCurrentPosition() > Global_Variables.maxViperUnderMinBeforeLift){
+                    new LedControl(ledDriver,1);
+                }
+
+                return false;
+            }
     }
 }
 

@@ -7,7 +7,7 @@ public class Autonomous_Variables {
 
 
     /////////////////// Basket Side //////////////////////
-    public static double[] sub_Spec_Set_Location = {-6,-36,90};
+    public static double[] sub_Spec_Set_Location = {-10,-36,90};
     public static int subDeliverLiftTarget = 1650;
     public static int subDeliverLondonTarget = 700;
     public static int subDeliverLondonDropDistance = 120;
