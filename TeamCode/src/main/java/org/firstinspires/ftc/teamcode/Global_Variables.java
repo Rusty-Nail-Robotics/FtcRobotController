@@ -4,7 +4,7 @@ public class Global_Variables {
      //General values
      static double speedOverride = .25;
      static double speedOverrideSlow = .75;
-     static double highSpeed = 1;
+     //static double highSpeed = 1;
      static double overCurrentOverride = 0.4;
      static double gripperOpen = 1;
      static double gripperClosed = 0;
@@ -26,8 +26,8 @@ public class Global_Variables {
      static int maxViperUnderMinBeforeLift = 3750;
      static int fastDownLiftTarget = 25;  //where to retract arm to when down arrow is pressed
      static int fastDownLondonTarget = 0;
-     public static int subDeliverLiftTarget = 1750;
-     public static int subDeliverLondonTarget = 450;
+     //public static int subDeliverLiftTarget = 1750;
+     //public static int subDeliverLondonTarget = 450;
 
 
 

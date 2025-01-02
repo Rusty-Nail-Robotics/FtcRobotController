@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 
-@Autonomous(name = "Basket Side")//Set Program Name and Mode
+@Autonomous(name = "Red Basket Side")//Set Program Name and Mode
 
-public final class Basket_Side_Auto extends LinearOpMode {
+public final class Basket_Side_Red_Auto extends LinearOpMode {
 
     Non_Move non_move = new Non_Move();
     ElapsedTime gameTime = new ElapsedTime();
@@ -28,7 +28,7 @@ public final class Basket_Side_Auto extends LinearOpMode {
     @Override
 
     public void runOpMode() {// Removed this to clear an error " throws InterruptedException { "
-        Pose2d beginPose = new Pose2d(-36, -60, Math.toRadians(90));
+        Pose2d beginPose = new Pose2d(Autonomous_Variables.basket_Side_Red[0], Autonomous_Variables.basket_Side_Red[1], Math.toRadians(Autonomous_Variables.basket_Side_Red[2]));
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "ledServo");  //Associate in-program name with robot configuration name
 
         non_move.Setup(hardwareMap, this);               //run the setup function in Non_Move
@@ -53,7 +53,9 @@ public final class Basket_Side_Auto extends LinearOpMode {
                 .waitSeconds(.25)
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 //.waitSeconds(.15)
+
                 .build();
+
         Actions.runBlocking(
                 new SequentialAction(
                         StartToSub
@@ -233,28 +235,7 @@ public final class Basket_Side_Auto extends LinearOpMode {
         }
 
     }
-        public static class CheckLiftLimit implements Action{ //made static to clear error
-            DcMotorEx lift;
-            DcMotorEx london;
-            RevBlinkinLedDriver ledDriver;
 
-
-            public CheckLiftLimit(RevBlinkinLedDriver ledDriver, DcMotorEx lift, DcMotorEx london){
-                this.london = london;
-                this.lift = lift;
-                this.ledDriver = ledDriver;
-
-            }
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-                if(london.getCurrentPosition() < Global_Variables.minBeforeExt && lift.getCurrentPosition() > Global_Variables.maxViperUnderMinBeforeLift){
-                    new LedControl(ledDriver,1);
-                }
-
-                return false;
-            }
-    }
 }
 
 
