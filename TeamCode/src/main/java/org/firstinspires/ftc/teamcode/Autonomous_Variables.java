@@ -14,11 +14,12 @@ public class Autonomous_Variables {
     public static int subDeliverRetractionDistance = 900;
 
 
-    public static double[] pick_From_Ground_Inner_Location = {-46, -41, 90};
+    public static double[] pick_From_Ground_Inner_Location = {-47, -41, 90};
     public static double[] pick_From_Ground_Center_Location ={-55,-41,90};
-    public static double[] pick_From_Ground_Outer_Location = {-48,-22,180};
+    public static double[] pick_From_Ground_Outer_Location = {-48,-24,180};
     public static int pickFromGroundLondonTarget = -100;
     public static int pickFromGroundLiftTarget = 1650;
+    public static int getPickOuterExtraReach = 200;
 
     public static double[] safe_Pivot_Point = {-46,-46};
     public static double[] place_In_Basket_Location = {-48,-48,225};

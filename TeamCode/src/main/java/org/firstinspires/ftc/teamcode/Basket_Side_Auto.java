@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
-
+import androidx.annotation.NonNull;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -7,7 +8,8 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -24,49 +26,56 @@ public final class Basket_Side_Auto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Pose2d beginPose = new Pose2d(-36, -60, Math.toRadians(90));
 
-
-
-
         non_move.Setup(hardwareMap, this);               //run the setup function in Non_Move
-
         Show_Off showOff = new Show_Off();                          //Create the container named showoff
         showOff.Setup(hardwareMap, this);               //run the setup function in Show_Off
-
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
-        Action StartToSub = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.sub_Spec_Set_Location[0], Autonomous_Variables.sub_Spec_Set_Location[1]), Math.toRadians(Autonomous_Variables.sub_Spec_Set_Location[2]))
-                .build();
-        non_move.londonMotor.setPower(.5);
 
-        waitForStart();
+
+
+         waitForStart();
         gameTime.reset();
 
             //// Place on High Chamber//
-        Global_Variables.basketMode = 3;
-        non_move.AutoLiftOperations(this);
+        Action StartToSub = drive.actionBuilder(drive.pose)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget,.5))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget,1))
+                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.sub_Spec_Set_Location[0], Autonomous_Variables.sub_Spec_Set_Location[1]), Math.toRadians(Autonomous_Variables.sub_Spec_Set_Location[2]))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget - Autonomous_Variables.subDeliverLondonDropDistance,1))
+                //.waitSeconds(.25)
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget - Autonomous_Variables.subDeliverRetractionDistance,1))
+                .waitSeconds(.25)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
+                //.waitSeconds(.15)
+                .build();
         Actions.runBlocking(
                 new SequentialAction(
                         StartToSub
                 )
         );
 
-        non_move.londonMotor.setTargetPosition(Autonomous_Variables.subDeliverLondonTarget - Autonomous_Variables.subDeliverLondonDropDistance);
-        WaitSeconds(.5);
-        non_move.liftMotor.setTargetPosition(Autonomous_Variables.subDeliverLiftTarget - Autonomous_Variables.subDeliverRetractionDistance);
 
-        WaitSeconds(.75);
+        //Pick up Inner Sample and place in high basket//
 
-        non_move.gripServo.setPosition(Global_Variables.gripperOpen);
 
-        WaitSeconds(.15);
-
-        //Pick up Inner Sample//
-
-        Global_Variables.basketMode = 2;
-        non_move.AutoLiftOperations(this);
 
         Action PickInnerFromFloor = drive.actionBuilder(drive.pose)
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.fastDownLiftTarget,1))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.fastDownLondonTarget,.25))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Inner_Location[0], Autonomous_Variables.pick_From_Ground_Inner_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Inner_Location[2]))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
+                .waitSeconds(.5)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget, 1))
+                .waitSeconds(.25)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
+                .waitSeconds(.25)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
+                .turnTo(Math.toRadians(225))
+                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
+                .waitSeconds(.35)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 .build();
         Actions.runBlocking(
                 new SequentialAction(
@@ -74,116 +83,63 @@ public final class Basket_Side_Auto extends LinearOpMode {
                 )
         );
 
-        non_move.liftMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLiftTarget);
-        while (non_move.liftMotor.getCurrentPosition() < 900) {
-            telemetry.update();//do nothing
-        }
-        non_move.londonMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLondonTarget);
-        WaitSeconds(1);
-        non_move.gripServo.setPosition(Global_Variables.gripperClosed);
-
-        //Place Inner Sample in High Basket
-
-        WaitSeconds(.5);
-        non_move.londonMotor.setPower(1);
-        non_move.londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
-
-        Action PrepPlaceInBasket = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
-                .turnTo(Math.toRadians(225))
-                .build();
-        Actions.runBlocking(
-                new SequentialAction(
-                        PrepPlaceInBasket
-                )
-        );
-        Global_Variables.basketMode = 1;
-        while (non_move.liftMotor.getCurrentPosition() < Global_Variables.maxViperUnderMinBeforeLift + 100) {
-            non_move.AutoLiftOperations(this);
-        }
-        Action PlaceInBasket = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
-                .build();
-        Actions.runBlocking(
-                new SequentialAction(
-                        PlaceInBasket
-                )
-        );
-        non_move.gripServo.setPosition(Global_Variables.gripperOpen);
-
-//Pick Middle Sample from floor
+//Pick Middle Sample from floor and place in high basket
 
         Action PickCenterFromFloor = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
-                .afterDisp(0, RetractLift())
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Center_Location[0], Autonomous_Variables.pick_From_Ground_Center_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Center_Location[2]))
-
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget,1))
+                .waitSeconds(.5)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget,.35))
+                .waitSeconds(1.5)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
+                .waitSeconds(.5)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
+                .turnTo(Math.toRadians(225))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
+                .waitSeconds(1)
+                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
+                .waitSeconds(.5)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 .build();
         Actions.runBlocking(
                 new SequentialAction(
                         PickCenterFromFloor
                 )
         );
-        non_move.liftMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLiftTarget);
 
-        WaitSeconds(2);
-        non_move.londonMotor.setPower(.35);
-        non_move.londonMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLondonTarget);
-        WaitSeconds(1.5);
-        non_move.gripServo.setPosition(Global_Variables.gripperClosed);
-        WaitSeconds(.5);
-
-        //Place middle sample in High Basket
-
-        non_move.londonMotor.setPower(1);
-        non_move.londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
-
-        Action PrepPlaceInBasketCent = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
-                .turnTo(Math.toRadians(225))
-                .build();
-        Actions.runBlocking(
-                new SequentialAction(
-                        PrepPlaceInBasketCent
-                )
-        );
-        Global_Variables.basketMode = 1;
-        while (non_move.liftMotor.getCurrentPosition() < Global_Variables.maxViperUnderMinBeforeLift + 100) {
-            non_move.AutoLiftOperations(this);
-        }
-        Action PlaceInBasketCent = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
-                .build();
-        Actions.runBlocking(
-                new SequentialAction(
-                        PlaceInBasketCent
-                )
-        );
-        non_move.gripServo.setPosition(Global_Variables.gripperOpen);
 
 
         // Pick Outer Sample from floor
 
         Action PickOuterFromFloor = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
-                .afterDisp(0, RetractLift())
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.pick_From_Ground_Outer_Location[0], Autonomous_Variables.pick_From_Ground_Outer_Location[1]), Math.toRadians(Autonomous_Variables.pick_From_Ground_Outer_Location[2]))
-
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget+50, .35))
+                .waitSeconds(1.5)
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget+Autonomous_Variables.getPickOuterExtraReach, 1))
+                .waitSeconds(.75)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget, .35))
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
+                .waitSeconds(.5)
+                .waitSeconds(.5)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, Global_Variables.basketLondonTarget, 1))
+                .strafeTo(new Vector2d(Autonomous_Variables.safe_Pivot_Point[0],Autonomous_Variables.safe_Pivot_Point[1]))
+                .turnTo(Math.toRadians(225))
+                .stopAndAdd(new MotorTarget(non_move.liftMotor, Global_Variables.basketLiftTarget,1))
+                .waitSeconds(1)
+                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.place_In_Basket_Location[0], Autonomous_Variables.place_In_Basket_Location[1]), Math.toRadians(Autonomous_Variables.place_In_Basket_Location[2]))
+                .waitSeconds(.5)
+                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 .build();
         Actions.runBlocking(
                 new SequentialAction(
                         PickOuterFromFloor
                 )
         );
-        non_move.liftMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLiftTarget);
-        WaitSeconds(2);
-        non_move.londonMotor.setPower(.35);
-        non_move.londonMotor.setTargetPosition(Autonomous_Variables.pickFromGroundLondonTarget);
-        WaitSeconds(1.5);
-        non_move.gripServo.setPosition(Global_Variables.gripperClosed);
-        WaitSeconds(.5);
-        non_move.londonMotor.setPower(1);
-        non_move.londonMotor.setTargetPosition(Global_Variables.basketLondonTarget);
 
 
 
@@ -191,12 +147,13 @@ public final class Basket_Side_Auto extends LinearOpMode {
 
 
 
-        gpTimer.reset();
-        while (gpTimer.seconds() < 10 && !isStopRequested()) {
-            telemetry.addData("Waiting ", gpTimer.seconds());
-            telemetry.update();
-        }
-        non_move.londonMotor.setTargetPosition(50);
+
+
+
+
+
+
+
         gpTimer.reset();
         while (gpTimer.seconds() < 2 && !isStopRequested()) {
             telemetry.addData("Waiting ", gpTimer.seconds());
@@ -220,7 +177,39 @@ public final class Basket_Side_Auto extends LinearOpMode {
         return RetractLift();
     }
 
+  public class MotorTarget implements Action{
+        DcMotorEx motor;
+        int target;
+        double power;
 
+        public MotorTarget(DcMotorEx m, int t, double p){
+            this.motor = m;
+            this.target = t;
+            this.power = p;
+        }
+      @Override
+      public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+          motor.setPower(power);
+          motor.setTargetPosition(target);
+          return false;
+      }
+  }
+    public class ServoTarget implements Action{
+        Servo servo;
+        double target;
+
+
+        public ServoTarget(Servo m, double t){
+            this.servo = m;
+            this.target = t;
+
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            servo.setPosition(target);
+            return false;
+        }
+    }
 }
 
 
