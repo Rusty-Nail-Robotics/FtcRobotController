@@ -56,19 +56,23 @@ public final class Non_Basket_Side_Red_Auto extends LinearOpMode {
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 //.waitSeconds(.15)
                 .stopAndAdd(new MotorTarget(non_move.liftMotor,Global_Variables.viperMin,1))
-                .stopAndAdd(new MotorTarget(non_move.londonMotor,0,1))
+               // .stopAndAdd(new MotorTarget(non_move.londonMotor,0,1))
 
 
                 ////// Deliver Samples to Human
+
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_1[0],Autonomous_Variables.jump_Point_1[1]),Math.toRadians(Autonomous_Variables.jump_Point_1[2]))
+                .stopAndAdd(new MotorTarget(non_move.londonMotor,0,1))
+                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_1__2[0],Autonomous_Variables.jump_Point_1__2[1]),Math.toRadians(Autonomous_Variables.jump_Point_1__2[2]))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_2[0],Autonomous_Variables.jump_Point_2[1]),Math.toRadians(Autonomous_Variables.jump_Point_2[2]))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.push_Point_1[0],Autonomous_Variables.push_Point_1[1]),Math.toRadians(Autonomous_Variables.push_Point_1[2]))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_2[0],Autonomous_Variables.jump_Point_2[1]),Math.toRadians(Autonomous_Variables.jump_Point_2[2]))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_3[0],Autonomous_Variables.jump_Point_3[1]),Math.toRadians(Autonomous_Variables.jump_Point_3[2]))
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.push_Point_2[0],Autonomous_Variables.push_Point_2[1]),Math.toRadians(Autonomous_Variables.push_Point_2[2]))
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_3[0],Autonomous_Variables.jump_Point_3[1]),Math.toRadians(Autonomous_Variables.jump_Point_3[2]))
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_4[0],Autonomous_Variables.jump_Point_4[1]),Math.toRadians(Autonomous_Variables.jump_Point_4[2]))
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.push_Point_3[0],Autonomous_Variables.push_Point_3[1]),Math.toRadians(Autonomous_Variables.push_Point_3[2]))
+                //.strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_3[0],Autonomous_Variables.jump_Point_3[1]),Math.toRadians(Autonomous_Variables.jump_Point_3[2]))
+                //.strafeToLinearHeading(new Vector2d(Autonomous_Variables.jump_Point_4[0],Autonomous_Variables.jump_Point_4[1]),Math.toRadians(Autonomous_Variables.jump_Point_4[2]))
+                //.strafeToLinearHeading(new Vector2d(Autonomous_Variables.push_Point_3[0],Autonomous_Variables.push_Point_3[1]),Math.toRadians(Autonomous_Variables.push_Point_3[2]))
+                //.strafeToLinearHeading(new Vector2d(Autonomous_Variables.pivot_Point[0],Autonomous_Variables.pivot_Point[1]),Math.toRadians(Autonomous_Variables.pivot_Point[2]))
 
                     ///////// Pick 1 from human and hang #2
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.clip_Grab_Point[0],Autonomous_Variables.clip_Grab_Point[1]),Math.toRadians(Autonomous_Variables.clip_Grab_Point[2]))
@@ -91,7 +95,8 @@ public final class Non_Basket_Side_Red_Auto extends LinearOpMode {
 
                 /////////////// Pick 2 from Human and Hang #3
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.clip_Grab_Point[0],Autonomous_Variables.clip_Grab_Point[1]),Math.toRadians(Autonomous_Variables.clip_Grab_Point[2]))
-                .waitSeconds(1.3)
+                .stopAndAdd(new MotorTarget(non_move.londonMotor, 0,.37))
+                .waitSeconds(.5)
                 .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
                 .waitSeconds(.7)
                 .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget,.37))
@@ -108,24 +113,7 @@ public final class Non_Basket_Side_Red_Auto extends LinearOpMode {
                 .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
                 //.waitSeconds(.15)
 
-                //////// Pick 3 from human and hang #4
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.clip_Grab_Point[0],Autonomous_Variables.clip_Grab_Point[1]),Math.toRadians(Autonomous_Variables.clip_Grab_Point[2]))
-                .waitSeconds(1.3)
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.pickFromGroundLiftTarget, 1))
-                .waitSeconds(.7)
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.pickFromGroundLondonTarget,.37))
-                .waitSeconds(.15)
-                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperClosed))
-                .waitSeconds(.15)
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget, 1))
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget, 1))
-                .strafeToLinearHeading(new Vector2d(Autonomous_Variables.getSub_Spec_Set_Location_Right[0], Autonomous_Variables.getSub_Spec_Set_Location_Right[1]), Math.toRadians(Autonomous_Variables.getSub_Spec_Set_Location_Right[2]))
-                .stopAndAdd(new MotorTarget(non_move.londonMotor, Autonomous_Variables.subDeliverLondonTarget - Autonomous_Variables.subDeliverLondonDropDistance, 1))
-                //.waitSeconds(.25)
-                .stopAndAdd(new MotorTarget(non_move.liftMotor, Autonomous_Variables.subDeliverLiftTarget - Autonomous_Variables.subDeliverRetractionDistance, 1))
-                .waitSeconds(.25)
-                .stopAndAdd(new ServoTarget(non_move.gripServo, Global_Variables.gripperOpen))
-                //.waitSeconds(.15)
+                // park in Observation Zone
                 .strafeToLinearHeading(new Vector2d(Autonomous_Variables.push_Point_3[0],Autonomous_Variables.push_Point_3[1]),Math.toRadians(Autonomous_Variables.push_Point_3[2]))
 
 

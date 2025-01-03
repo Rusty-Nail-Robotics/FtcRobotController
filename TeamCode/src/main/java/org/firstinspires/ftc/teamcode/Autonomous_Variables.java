@@ -34,11 +34,13 @@ public class Autonomous_Variables {
     /////////////////// Non Basket Side //////////////////////
     public static double[] getSub_Spec_Set_Location_Right = {10,-36,90};
     public static double[] jump_Point_1 = {36,-36,180};
-    public static double[] jump_Point_2 = {48,-18,180};
-    public static double[] push_Point_1 = {48,-56,180};
-    public static double[] jump_Point_3 = {60,-18,180};
-    public static double[] push_Point_2 = {60,-56,180};
-    public static double[] jump_Point_4 = {68,-18,-180};
-    public static double[] push_Point_3 = {68,-56,180};
-    public static double[] clip_Grab_Point = {20,-60,0};
+    public static double[] jump_Point_2 = {48,-7,180};
+    public static double[] push_Point_1 = {48,-52,180};
+    public static double[] jump_Point_3 = {54,-7,180};
+    public static double[] push_Point_2 = {54,-52,180};
+    public static double[] jump_Point_4 = {58,-7,-180};
+    public static double[] push_Point_3 = {56,-52,180};
+    public static double[] clip_Grab_Point = {32,-44,320};   // used as parking location
+    public static double[] jump_Point_1__2 = {36,-10,180};
+
 }
